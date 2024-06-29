@@ -847,7 +847,7 @@ class SwinTransformerSys(nn.Module):
 
         return x, x_downsample
 
-    # ##Dencoder and Skip connection
+    # ##Decoder and Skip connection
     # def forward_up_features(self, x, x_downsample):
     #     for inx, layer_up in enumerate(self.layers_up):
     #         if inx == 0:
