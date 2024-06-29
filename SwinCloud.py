@@ -307,8 +307,8 @@ class SwinTransformerBlock(nn.Module):
         x = x.view(B, H, W, C)
 
         # local connection
-        # local = x.permute(0, 3, 1, 2)   #'B,C,H,W'
-        # local = self.local2(local) + self.local1(local)
+        local = x.permute(0, 3, 1, 2)   #'B,C,H,W'
+        local = self.local2(local) + self.local1(local)
 
 
         # cyclic shift
@@ -340,11 +340,10 @@ class SwinTransformerBlock(nn.Module):
         x = x + self.drop_path(self.mlp(self.norm2(x)))
 
         # #
-        # x = x.view(B, H, W, C).permute(0, 3, 1, 2)
-        #
-        # x = x +local
-        # x = self.local_proj(x)
-        # x = x.permute(0, 2, 3, 1).view(B, H * W, C) #'B,L,C'
+        x = x.view(B, H, W, C).permute(0, 3, 1, 2)
+        x = x +local
+        x = self.local_proj(x)
+        x = x.permute(0, 2, 3, 1).view(B, H * W, C) #'B,L,C'
 
 
 
@@ -847,22 +846,7 @@ class SwinTransformerSys(nn.Module):
 
         return x, x_downsample
 
-    # ##Decoder and Skip connection
-    # def forward_up_features(self, x, x_downsample):
-    #     for inx, layer_up in enumerate(self.layers_up):
-    #         if inx == 0:
-    #             x = layer_up(x)
-    #         else:
-    #             x = torch.cat([x, x_downsample[3 - inx]], -1)
-    #             x = self.concat_back_dim[inx](x)
-    #             x = layer_up(x)
-    #
-    #     x = self.norm_up(x)  # B L C
-    #
-    #     return x
-
-
-    ## 
+    ## ##Decoder and Skip connection
     def forward_up_features(self, x, x_downsample):
         for inx, layer_up in enumerate(self.layers_up):
             if inx == 0:
